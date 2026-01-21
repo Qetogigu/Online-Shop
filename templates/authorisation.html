@@ -1,0 +1,21 @@
+{%extends 'base.html'%}
+{%block content%}
+
+<form method="POST">
+    {{form.hidden_tag()}}
+    <div class="container">
+        <h1>authorisation</h1>
+        <div class="row mt-2">
+            {{form.username(class='form-control', placeholder=form.username.label.text)}}
+        </div>
+
+        <div class="row mt-2">
+            {{form.password(class='form-control', placeholder=form.password.label.text)}}
+        </div>
+
+
+        {{form.sign_in(class='btn btn-primary')}}
+    </div>
+</form>
+
+{%endblock%}

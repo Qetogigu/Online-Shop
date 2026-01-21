@@ -1,0 +1,23 @@
+{%extends 'base.html'%}
+{%block content%}
+
+<form method="POST">
+    {{form.hidden_tag()}}
+    <div class="container">
+        <h1>registration</h1>
+        <div class="row mt-2">
+            {{form.username(class='form-control', placeholder=form.username.label.text)}}
+        </div>
+
+        <div class="row mt-2">
+            {{form.password(class='form-control', placeholder=form.password.label.text)}}
+        </div>
+
+        <div class="row mt-2">
+            {{form.repeat_password(class='form-control', placeholder=form.repeat_password.label.text)}}
+        </div>
+        {{form.sign_up(class='btn btn-primary')}}
+    </div>
+</form>
+
+{%endblock%}

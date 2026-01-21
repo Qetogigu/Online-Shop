@@ -1,0 +1,24 @@
+{%extends 'base.html'%}
+{%block content%}
+
+<form method="POST" enctype="multipart/form-data">
+    {{form.hidden_tag()}}
+    <div class="container">
+        <h1>create a product</h1>
+        <div class="row mt-2">
+            {{form.name(class='form-control', placeholder=form.name.label.text)}}
+        </div>
+
+        <div class="row mt-2">
+            {{form.price(class='form-control', placeholder=form.price.label.text)}}
+        </div>
+
+        <div class="row mt-2">
+            {{form.img(class='form-control', placeholder=form.img.label.text)}}
+        </div>
+        <hr>
+        {{form.submit(class='btn btn-primary')}}
+    </div>
+</form>
+
+{%endblock%}

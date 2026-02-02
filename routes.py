@@ -2,7 +2,8 @@
 # flask does this using certain communication standard. it binds html with python
 from flask import render_template, redirect, request
 from models import Product, User
-
+from ai import generate_ai_characteristics, ai_recommend
+import re
 from flask_login import login_user, logout_user, login_required, current_user
 from forms import ProductForm, LoginForm, RegisterForm
 from ext import app, db
@@ -120,4 +121,48 @@ def authorisation():
 def logout():
     logout_user()
     return redirect('/')
+
+
+@app.route('/product/<int:product_id>')
+def product_detail(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    ai_description = generate_ai_characteristics(product)
+
+    return render_template(
+        'product.html',
+        product=product,
+        ai_description=ai_description
+    )
+
+
+@app.route('/ask_ai', methods=['GET', 'POST'])
+@login_required
+def ask_ai():
+    answer = None
+    recommendations=[]
+    if request.method == 'POST':
+        question = request.form['question']
+        min_price = int(request.form['min_price'])
+        max_price = int(request.form['max_price'])
+
+        products = Product.query.filter(
+            Product.price >= min_price,
+            Product.price <= max_price
+        ).all()
+
+        ai_text = ai_recommend(products, question)
+
+
+        ids = re.findall(r'ID:(\d+)', ai_text)#this filters everything by its id
+
+        for pid in ids:
+            product = Product.query.get(pid)
+            if product:
+                recommendations.append(product)
+
+    return render_template(
+        'ask_ai.html',
+        recommendations=recommendations
+    )
 

@@ -1,33 +1,47 @@
-{% extends 'base.html' %}
-{% block content %}
+from openai import OpenAI
+import os
 
-<h2>Ask AI for Product Recommendations</h2>
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-<form method="POST">
-    <textarea name="question" class="form-control"
-              placeholder="What are you looking for?"></textarea>
+def generate_ai_characteristics(product):
+    prompt = f"""
+    Analyze the following product and describe its characteristics,features, and best use cases. there should be only text and respond like you are trying to persuade the user:
 
-    <input type="number" name="min_price" placeholder="Min Price">
-    <input type="number" name="max_price" placeholder="Max Price">
+    Name: {product.name}
+    Price: {product.price}
+    """
 
-    <button class="btn btn-success mt-2">
-        Find Best Products
-    </button>
-</form>
+    response = client.responses.create(
+        model="gpt-4.1-mini",
+        input=prompt
+    )
 
-{% if recommendations %}
-<h3>AI Recommended Products</h3>
+    return response.output_text
 
-<ul class="list-group">
-    {% for product in recommendations %}
-    <li class="list-group-item">
-        <a href="{{ url_for('product_detail', product_id=product.id) }}">
-            {{ product.name }} - ${{ product.price }}
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
+def ai_recommend(products, user_request):
+    product_data = ""
 
+    for p in products:
+        product_data += f"ID:{p.id} | {p.name} | price:{p.price}\n"
 
-{% endblock %}
+    prompt = f"""
+    User request:
+    {user_request}
+
+    Available products:
+    {product_data}
+
+    TASK:
+    - Choose the BEST matching products
+    - Return ONLY product IDs
+    - Use this format exactly:
+
+    ID:<number> 
+    """
+
+    response = client.responses.create(
+        model="gpt-4.1-mini",
+        input=prompt
+    )
+
+    return response.output_text
